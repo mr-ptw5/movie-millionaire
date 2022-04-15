@@ -22,7 +22,8 @@ document.querySelector('#movie-guess').addEventListener('click', guessMovie)
 
 function getActorID(){
   if (localStorage.getItem('actor')) {
-    let actorsStorage = localStorage.getItem('actorsStorage') || []
+
+    let actorsStorage = JSON.parse(localStorage.getItem('actorsStorage') || '[]')
     let newActor = JSON.parse(localStorage.getItem('actor'))
     console.log(actorsStorage, newActor)
     localStorage.setItem('actorsStorage', JSON.stringify( actorsStorage.concat(newActor) ))
@@ -71,9 +72,9 @@ function getPlotSynopsis(movieID) {
 }
 
 function guessMovie() {
-  const movieGuess = document.querySelector("#movie-input").value.toLowerCase()
+  const movieGuess = document.querySelector("#movie-input").value.toLowerCase().replace(/ /g, "")
   document.querySelector("#movie-input").value = ""
-  if (movieGuess === JSON.parse(localStorage.getItem('movie')).title.toLowerCase())
+  if (movieGuess === JSON.parse(localStorage.getItem('movie')).title.toLowerCase().replace(/ /g, ''))
     win()
   else
     lose()
@@ -110,7 +111,11 @@ function setActor(actor) {
 }
 
 function setMovie(movie) {
-  document.querySelector('section h3').innerText = `${movie.year}\nrole: ${movie.role}`
+  let role = movie.role
+  if (movie.title.toLowerCase().includes(role.toLowerCase())) {
+    role = censorTitle(role)
+  }
+  document.querySelector('section h3').innerText = `${movie.year}\nrole: ${role}`
   // document.querySelector('h3').innerText = movie.plot.replaceAll(movie.title, '[movie title]')
         // document.querySelector('h3').innerText = bigMovie.title
 }
@@ -142,4 +147,10 @@ function clearMovie() {
     alert('you went through all their biggest movies')
   }
   return remainingMovieCount
+}
+
+function censorTitle(strng) {
+  strng = strng.split(' ')
+  strng = strng.map(word => word[0] + "*".repeat(word.slice(1).length)).join(' ')
+  return `${strng}\n[censored because this character's name is in the movie's title]`
 }
