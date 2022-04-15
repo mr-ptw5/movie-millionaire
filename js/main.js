@@ -31,7 +31,7 @@ function getActorID(){
 
 
   const actor = encodeURIComponent(document.querySelector('#actor-input').value)
-  const url = `https://imdb-api.com/en/API/SearchName/k_7qwl86a3/${actor}`
+  const url = `https://imdb-api.com/en/API/SearchName/k_c7gkqf7r/${actor}`
   //let more = are gonna = be k_7qwl86a3 kro  k_c7gkqf7r sudo ok cool that's all
   console.log(url)
 
@@ -48,7 +48,7 @@ function getActorID(){
 }
 
 function getActorMovies(id) {
-  fetch(`https://imdb-api.com/en/API/Name/k_7qwl86a3/${id}`)
+  fetch(`https://imdb-api.com/en/API/Name/k_c7gkqf7r/${id}`)
       .then(res => res.json()) // parse response as JSON
       .then(data => {
         console.log("got the actor's list of movies")
@@ -61,7 +61,7 @@ function getActorMovies(id) {
 }
 
 function getPlotSynopsis(movieID) {
-  fetch(`https://imdb-api.com/en/API/Title/k_7qwl86a3/${movieID}`)
+  fetch(`https://imdb-api.com/en/API/Title/k_c7gkqf7r/${movieID}`)
       .then(res => res.json()) // parse response as JSON
       .then(data => {
         movieData = data
