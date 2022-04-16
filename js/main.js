@@ -6,7 +6,8 @@ if (localStorage.getItem('actor')) {
   if (localStorage.getItem('movie'))
   setMovie(JSON.parse(localStorage.getItem('movie')))
 }
-updateWinPercentage()
+if (localStorage.getItem('wins') || localStorage.getItem('losses'))
+  updateWinPercentage()
 
 let incrementLocalStorageVar = (varName, incrementValue) => {
   let localVar = localStorage.getItem(varName)
@@ -33,7 +34,6 @@ function getActorID(){
   const actor = encodeURIComponent(document.querySelector('#actor-input').value)
   const url = `https://imdb-api.com/en/API/SearchName/k_c7gkqf7r/${actor}`
   //let more = are gonna = be k_7qwl86a3 kro  k_c7gkqf7r sudo ok cool that's all
-  console.log(url)
 
   fetch(url)
       .then(res => res.json()) // parse response as JSON
@@ -72,9 +72,12 @@ function getPlotSynopsis(movieID) {
 }
 
 function guessMovie() {
-  const movieGuess = document.querySelector("#movie-input").value.toLowerCase().replace(/ /g, "")
+  let movieGuess = document.querySelector("#movie-input").value
+  movieGuess = sanitizeString(movieGuess)
+  let movieTitle = JSON.parse(localStorage.getItem('movie')).title
+  movieTitle = sanitizeString(movieTitle)
   document.querySelector("#movie-input").value = ""
-  if (movieGuess === JSON.parse(localStorage.getItem('movie')).title.toLowerCase().replace(/ /g, ''))
+  if (movieGuess.localeCompare(movieTitle, 'en', {sensitivity: 'base'}) === 0)
     win()
   else
     lose()
@@ -142,8 +145,8 @@ function clearMovie() {
   if (remainingMovieCount === 0) {
     localStorage.removeItem('actor')
     document.querySelector('section h2').innerText = "choose an actor"
-  document.querySelector('section h3').innerText = ""
-  document.querySelector('img').src = ""
+    document.querySelector('section h3').innerText = ""
+    document.querySelector('img').src = ""
     alert('you went through all their biggest movies')
   }
   return remainingMovieCount
@@ -153,4 +156,46 @@ function censorTitle(strng) {
   strng = strng.split(' ')
   strng = strng.map(word => word[0] + "*".repeat(word.slice(1).length)).join(' ')
   return `${strng}\n[censored because this character's name is in the movie's title]`
+}
+
+const intToRoman = (num) => {
+  const map = {
+    M: 1000,
+    CM: 900,
+    D: 500,
+    CD: 400,
+    C: 100,
+    XC: 90,
+    L: 50,
+    XL: 40,
+    X: 10,
+    IX: 9,
+    V: 5,
+    IV: 4,
+    I: 1,
+  };
+  let result = '';
+  
+  for (key in map) {  
+    const repeatCounter = Math.floor(num / map[key]);
+    
+    if (repeatCounter !== 0) {
+      result += key.repeat(repeatCounter);
+    }
+    
+    num %= map[key];
+    
+    if (num === 0) return result;
+  }
+  
+  return result;
+};
+
+function sanitizeString(strng) {
+  strng = strng.replace(/\d+/g, intToRoman).toLowerCase()
+  strng = strng.replaceAll('&', 'and')
+  if (['a', 'an', 'the'].includes(strng.split(' ')[0]))
+    strng = strng.split(' ').slice(1).join('')
+  strng = strng.replace(/[^a-zA-Z\dÀ-ÿ]/g, "")
+  return strng
 }
